@@ -5,6 +5,7 @@ import SignClient  from '@walletconnect/sign-client';
 import { Button, Text, View } from 'react-native';
 
 import Connect from '../components/Connect';
+import { createWalletConnectClient } from '../utils/wallet-connect-utils';
 // import Session from '../components/Session';
 
 export default function ConnectScreen() {
@@ -22,16 +23,7 @@ export default function ConnectScreen() {
       if(!Constants.expoConfig?.extra?.WALLET_CONNECT_RELAY_URL){
         throw Error('No WALLET_CONNECT_RELAY_URL in app.json')
       }
-      const client = await SignClient.init({
-        projectId: Constants.expoConfig.extra.WALLET_CONNECT_PROJECT_ID,
-        relayUrl: Constants.expoConfig.extra.WALLET_CONNECT_RELAY_URL,
-        metadata: {
-          description: "SWIP app",
-          url: "#",
-          icons: ["https://walletconnect.com/walletconnect-logo.png"],
-          name: "SWIP",
-        }
-      });
+      const client = await createWalletConnectClient()
       if (subscribed) {
         setSignClient(client)
       }
@@ -48,16 +40,7 @@ export default function ConnectScreen() {
     if(!Constants.expoConfig?.extra?.WALLET_CONNECT_RELAY_URL){
       throw Error('No WALLET_CONNECT_RELAY_URL in app.json')
     }
-    const client = await SignClient.init({
-      projectId: Constants.expoConfig.extra.WALLET_CONNECT_PROJECT_ID,
-      relayUrl: Constants.expoConfig.extra.WALLET_CONNECT_RELAY_URL,
-      metadata: {
-        description: "SWIP app",
-        url: "#",
-        icons: ["https://walletconnect.com/walletconnect-logo.png"],
-        name: "SWIP",
-      }
-    });
+    const client = await createWalletConnectClient();
     setSignClient(client)
   }
 

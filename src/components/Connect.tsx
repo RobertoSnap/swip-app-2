@@ -4,6 +4,7 @@ import {SignClient} from '@walletconnect/sign-client/dist/types/client';
 import {ProposalTypes, SignClientTypes, Verify} from '@walletconnect/types';
 import {Button, TextInput} from 'react-native';
 import {useWallet} from '../state/wallet-connect-state';
+import QrScanner from './QrScanner';
 
 const buttonStyle = {
   height: 40,
@@ -23,12 +24,14 @@ interface Props {
 export default function Connect({signClient}: Props) {
   const [connectionString, setConnectionString] = useState<string>();
   const {secret, createWallet, getWallet} = useWallet();
+  const [showCamera, setShowCamera] = useState<boolean>(false);
 
-  const onSubmit = async () => {
-    if (!connectionString) {
+  const pair = async (uri?: string) => {
+    if (!uri) {
       throw Error('No connection string provided');
     }
-    const res = await signClient.pair({uri: connectionString});
+    const res = await signClient.core.pairing.pair({uri});
+    setShowCamera(false)
     console.log(res);
   };
 
@@ -84,7 +87,9 @@ export default function Connect({signClient}: Props) {
         style={buttonStyle}
         onChangeText={text => setConnectionString(text)}
       />
-      <Button title="Submit" onPress={onSubmit} />
+      <Button title="scan" onPress={() => setShowCamera(!showCamera)}></Button>
+      {showCamera && <QrScanner onScan={(uri) => pair(uri)}></QrScanner>}
+      <Button title="Connect" onPress={() => pair(connectionString)} />
     </>
   );
 }
