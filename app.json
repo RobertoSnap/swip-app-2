@@ -25,6 +25,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "WALLET_CONNECT_PROJECT_ID": "b8ed0ff7ca691af14cbea6ab49907515",
+      "WALLET_CONNECT_RELAY_URL": "wss://relay.walletconnect.com"
     }
   }
 }
