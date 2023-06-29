@@ -1,9 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import '@walletconnect/react-native-compat';
-import {SignClient} from '@walletconnect/sign-client/dist/types/client';
-import {ProposalTypes, SignClientTypes, Verify} from '@walletconnect/types';
-import {Button, TextInput} from 'react-native';
-import {useWallet} from '../state/wallet-connect-state';
+import { SignClient } from '@walletconnect/sign-client/dist/types/client';
+import { ProposalTypes, SignClientTypes, Verify } from '@walletconnect/types';
+import { Button, TextInput, StyleSheet } from 'react-native';
+import { useWallet } from '../state/useWallet';
 import QrScanner from './QrScanner';
 
 const buttonStyle = {
@@ -17,79 +17,66 @@ type ApproveEvent = {
   verifyContext: Verify.Context;
 } & Omit<SignClientTypes.BaseEventArgs<ProposalTypes.Struct>, 'topic'>;
 
-interface Props {
-  signClient: SignClient;
-}
 
-export default function Connect({signClient}: Props) {
+export default function Connect() {
+  const { client } = useWallet();
   const [connectionString, setConnectionString] = useState<string>();
-  const {secret, createWallet, getWallet} = useWallet();
+  const { secret, createWallet, getWallet } = useWallet();
   const [showCamera, setShowCamera] = useState<boolean>(false);
 
   const pair = async (uri?: string) => {
+    if (!client) {
+      throw Error('No client found')
+    }
     if (!uri) {
       throw Error('No connection string provided');
     }
-    const res = await signClient.core.pairing.pair({uri});
+    const res = await client.core.pairing.pair({ uri });
     setShowCamera(false)
     console.log(res);
   };
-
-  // create wallet if secret is undefined
-  useEffect(() => {
-    if (!secret) {
-      createWallet();
-    }
-  }, [secret, createWallet]);
-
-  const approveSession = useCallback(
-    async (event: ApproveEvent) => {
-      console.log('Start approve pairing, id: ', event.id);
-      const wallet = getWallet()
-      if (!wallet) {
-        throw Error('No wallet found');
-      }
-      console.log("Found wallet", wallet.address)
-      const {topic, acknowledged} = await signClient.approve({
-        id: event.id,
-        namespaces: {
-          eip155: {
-            accounts: [`eip155:5:${wallet.address}`],
-            methods: ['personal_sign', 'eth_sendTransaction', 'request_credential'],
-            events: ['accountsChanged'],
-          },
-        },
-      });
-      console.log('Session approved, topic:', topic);
-
-      const session = await acknowledged();
-      console.log('Session acknowledged, session:', session);
-    },
-    [signClient],
-  );
-
-  useEffect(() => {
-    signClient.on('session_proposal', event => {
-      console.log('TEST_EVENT received!', event);
-      approveSession(event);
-    });
-
-    return () => {
-      signClient.removeAllListeners('session_proposal');
-    };
-  }, [approveSession, signClient]);
 
   return (
     <>
       <TextInput
         value={connectionString}
         placeholder="Enter connection string"
-        style={buttonStyle}
+        style={styles.input}
         onChangeText={text => setConnectionString(text)}
       />
-      <Button title="scan" onPress={() => setShowCamera(!showCamera)}></Button>
+      <Button title="Connect" onPress={() => pair(connectionString)} color={styles.button.backgroundColor} />
+      <Button title="Scan with camera" onPress={() => setShowCamera(!showCamera)} color={styles.button.backgroundColor} />
       {showCamera && <QrScanner onScan={(uri) => pair(uri)}></QrScanner>}
-      <Button title="Connect" onPress={() => pair(connectionString)} />
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  input: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingLeft: 10,
+    paddingRight: 10,
+    marginBottom: 15,
+    borderRadius: 5,
+    fontSize: 16,
+  },
+  button: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#1E90FF',
+    borderRadius: 5,
+    borderColor: 'gray',
+    borderWidth: 1,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  qrScanner: {
+    width: '100%',
+  },
+});
+

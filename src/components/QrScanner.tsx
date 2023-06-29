@@ -3,7 +3,7 @@ import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeEvent, BarCodeScanner, PermissionStatus } from 'expo-barcode-scanner';
 
 interface Props {
-    onScan: (data: string) => void;
+  onScan: (data: string) => void;
 }
 
 export default function QrScanner(props: Props) {
@@ -22,12 +22,12 @@ export default function QrScanner(props: Props) {
   const handleBarCodeScanned = (barcode: BarCodeEvent) => {
     setScanned(true);
     // alert(`Bar code with type ${barcode.type} and data ${barcode.data} has been scanned!`);
-    if(barcode.type === 'org.iso.QRCode'){
-        console.log("Scanned QRcode")
-        if(barcode.data.includes("wc:")){
-            console.log("Scanned WalletConnect QRcode")
-            props.onScan(barcode.data)
-        }
+    if (barcode.type === 'org.iso.QRCode') {
+      console.log("Scanned QRcode")
+      if (barcode.data.includes("wc:")) {
+        console.log("Scanned WalletConnect QRcode")
+        props.onScan(barcode.data)
+      }
     }
   };
 

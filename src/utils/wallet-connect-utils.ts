@@ -3,7 +3,6 @@ import React from 'react';
 import '@walletconnect/react-native-compat';
 import Constants from 'expo-constants'
 import SignClient from '@walletconnect/sign-client';
-import { Logs } from 'expo'
 
 
 export async function createWalletConnectClient() {
