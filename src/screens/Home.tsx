@@ -4,10 +4,10 @@ import { Button, Text, View } from 'react-native';
 
 import Connect from '../components/Connect';
 import { useWallet } from '../state/useWallet';
+import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
-export default function Main() {
+export default function Home() {
   const { init, ready, activeSession, client, handleApproveSession, handleSessionRequest } = useWallet()
 
 
@@ -34,7 +34,9 @@ export default function Main() {
 
 
   return (
-    <View >
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <StatusBar style="auto" />
+      <Text>Home</Text>
       <Text>WalletConnect</Text>
       <Text>WalletConnect ready: {ready ? 'Yes' : 'No'} </Text>
       <Text>Active session: {activeSession ? 'Yes' : 'No'} </Text>

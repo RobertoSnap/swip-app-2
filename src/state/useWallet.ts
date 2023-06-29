@@ -15,7 +15,8 @@ interface State {
   activeSession: boolean;
   client: SignClient | undefined;
   sessions: SessionTypes.Struct[]
-  vcs: string[]
+  jwt_unverified: string[]
+  jwt_verified: string[]
   createWallet: () => void;
   getWallet: () => ethers.Wallet | undefined;
   init: () => void;
@@ -39,7 +40,8 @@ export const useWallet = create<State>()(
       activeSession: false,
       client: undefined,
       sessions: [],
-      vcs: [],
+      jwt_unverified: [],
+      jwt_verified: [],
       getWallet: () => {
         const secret = get().secret;
         if (!secret) {
@@ -101,14 +103,16 @@ export const useWallet = create<State>()(
           if (Array.isArray(event.params.request.params)) {
             const jwt = event.params.request.params[0];
             if (typeof jwt === "string") {
-              let decoded = didJWT.decodeJWT(jwt);
-              console.log("decoded", decoded)
+              try {
+                didJWT.decodeJWT(jwt);
+                return set({ jwt_unverified: [...get().jwt_unverified, jwt] });
+              } catch (error) {
+                console.log(error)
+              }
             }
           }
-
         }
       }
-
     }),
     {
       name: 'wallet-state', // name of item in the storage (must be unique)
