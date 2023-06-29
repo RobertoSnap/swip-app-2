@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import Constants from 'expo-constants';
+import React, { useEffect } from 'react';
 import '@walletconnect/react-native-compat';
-import SignClient from '@walletconnect/sign-client';
 import { Button, Text, View } from 'react-native';
 
 import Connect from '../components/Connect';
-import { createWalletConnectClient } from '../utils/wallet-connect-utils';
 import { useWallet } from '../state/useWallet';
-import Sessions from '../components/Sessions';
-import { SignClientTypes } from '@walletconnect/types';
-// import Session from '../components/Session';
+
+
 
 export default function Main() {
   const { init, ready, activeSession, client, handleApproveSession, handleSessionRequest } = useWallet()
@@ -47,7 +43,7 @@ export default function Main() {
         title={!ready ? 'Initialize' : 'Initialized'}
         onPress={() => connect()}
       />
-      {ready && <Connect />}
+      {ready && !activeSession && <Connect />}
       {/* {ready && <Sessions />} */}
 
     </View>

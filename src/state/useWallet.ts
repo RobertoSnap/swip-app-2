@@ -65,9 +65,13 @@ export const useWallet = create<State>()(
         if (!client) {
           throw Error('No client found')
         }
-        const wallet = get().getWallet()
+        let wallet = get().getWallet()
         if (!wallet) {
-          throw Error('No wallet found');
+          get().createWallet();
+          wallet = get().getWallet()
+          if (!wallet) {
+            throw Error('No wallet found');
+          }
         }
         const { topic, acknowledged } = await client.approve({
           id: event.id,
@@ -93,15 +97,15 @@ export const useWallet = create<State>()(
           throw Error('No client found')
         }
         console.log("event.params.request", event.params.request)
-        if(event.params.request.method === "receive_credential"){
-          if(Array.isArray(event.params.request.params)){
+        if (event.params.request.method === "receive_credential") {
+          if (Array.isArray(event.params.request.params)) {
             const jwt = event.params.request.params[0];
-            if(typeof jwt === "string"){
+            if (typeof jwt === "string") {
               let decoded = didJWT.decodeJWT(jwt);
               console.log("decoded", decoded)
             }
           }
-          
+
         }
       }
 

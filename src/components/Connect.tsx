@@ -21,7 +21,6 @@ type ApproveEvent = {
 export default function Connect() {
   const { client } = useWallet();
   const [connectionString, setConnectionString] = useState<string>();
-  const { secret, createWallet, getWallet } = useWallet();
   const [showCamera, setShowCamera] = useState<boolean>(false);
 
   const pair = async (uri?: string) => {
